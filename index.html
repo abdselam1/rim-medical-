@@ -510,9 +510,11 @@ footer{
 }
 .f-social a:hover{background:var(--teal);transform:translateY(-3px)}
 .copyright{
-  border-top:1px solid rgba(255,255,255,.1);padding:20px 0;text-align:center;
+  border-top:1px solid rgba(255,255,255,.1);padding:20px 0 8px;text-align:center;
   font-size:.82rem;color:rgba(255,255,255,.4);
 }
+.dev-credit{padding:0 0 20px;text-align:center;font-size:.78rem;color:rgba(255,255,255,.35)}
+.dev-credit .dev-name{color:var(--teal);font-weight:700}
 @media (max-width:820px){.footer-grid{grid-template-columns:1fr}}
 
 /* =========================================================
@@ -822,6 +824,7 @@ footer{
       </div>
     </div>
     <div class="copyright">© <span id="year"></span> Rim Medical — <span data-i18n="footer.rights"></span></div>
+    <div class="dev-credit"><span data-i18n="footer.devLbl"></span> <span class="dev-name" data-i18n="footer.devName"></span></div>
   </div>
 </footer>
 
@@ -921,7 +924,8 @@ const I18N = {
       hoursTitle:"ساعات العمل",
       days1:"السبت — الخميس", hours1:"9:00 ص — 10:00 م",
       days2:"الجمعة", hours2:"4:00 م — 10:00 م",
-      rights:"جميع الحقوق محفوظة"
+      rights:"جميع الحقوق محفوظة",
+      devLbl:"برمجة وتطوير:", devName:"محمد عبد السلام"
     },
     floatWaMsg:"السلام عليكم، لدي استفسار عن منتجات Rim Medical."
   },
@@ -997,7 +1001,8 @@ const I18N = {
       hoursTitle:"Horaires d'ouverture",
       days1:"Samedi — Jeudi", hours1:"9h00 — 22h00",
       days2:"Vendredi", hours2:"16h00 — 22h00",
-      rights:"Tous droits réservés"
+      rights:"Tous droits réservés",
+      devLbl:"Conception & développement :", devName:"Mohamed Abdesselam"
     },
     floatWaMsg:"Bonjour, j'ai une question sur les produits Rim Medical."
   },
@@ -1073,7 +1078,8 @@ const I18N = {
       hoursTitle:"Working Hours",
       days1:"Saturday — Thursday", hours1:"9:00 AM — 10:00 PM",
       days2:"Friday", hours2:"4:00 PM — 10:00 PM",
-      rights:"All rights reserved"
+      rights:"All rights reserved",
+      devLbl:"Programming & development:", devName:"Mohamed Abdesselam"
     },
     floatWaMsg:"Hello, I have a question about Rim Medical products."
   }

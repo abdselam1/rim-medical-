@@ -939,6 +939,31 @@
         .nav-logo-img, .why-center-logo { animation: logo3dS 8s ease-in-out infinite; }
         .hero-logo { animation: logoPulse 4s ease-in-out infinite, logo3dS 8s ease-in-out infinite; }
         .about-center-logo { animation: logo3dS 8s ease-in-out infinite; }
+
+        /* ====== مبدّل اللغة ====== */
+        .lang-switch-s {
+            display: flex; gap: 3px; z-index: 1001;
+            background: rgba(200,164,92,0.06);
+            border: 1px solid var(--border-subtle);
+            border-radius: 50px; padding: 3px;
+        }
+        .lang-btn-s {
+            background: transparent; border: none; cursor: pointer;
+            color: var(--text-muted); font-family: 'Cairo', sans-serif;
+            font-size: .72rem; font-weight: 700; letter-spacing: 1px;
+            padding: 6px 12px; border-radius: 50px; transition: all .3s;
+        }
+        .lang-btn-s:hover { color: var(--gold-light); }
+        .lang-btn-s.active { background: rgba(200,164,92,0.22); color: var(--gold-light); }
+        @media(max-width:1024px){ .lang-switch-s { margin-inline-start: auto; } }
+        /* ====== إصلاحات الاتجاه للغات اللاتينية ====== */
+        html[dir="ltr"] .nav-links a::after { right: auto; left: 0; }
+        html[dir="ltr"] .about-badge { right: auto; left: 24px; }
+        html[dir="ltr"] .why-item:hover { transform: translateX(6px); }
+        html[dir="ltr"] .form-note i { margin-left: 0; margin-right: .3rem; }
+        html[dir="ltr"] .wa-float { left: auto; right: 30px; }
+        html[dir="ltr"] .wa-tooltip { left: auto; right: 76px; }
+        @media(max-width:600px){ html[dir="ltr"] .wa-float { left: auto; right: 16px; } }
     </style>
 </head>
 <body>
@@ -995,6 +1020,11 @@
             <li><a href="#contact">اتصل بنا</a></li>
             <li><a href="https://wa.me/22232222206" target="_blank" class="nav-cta">تواصل عبر واتساب 💬</a></li>
         </ul>
+        <div class="lang-switch-s">
+            <button class="lang-btn-s active" data-lang="ar">AR</button>
+            <button class="lang-btn-s" data-lang="fr">FR</button>
+            <button class="lang-btn-s" data-lang="en">EN</button>
+        </div>
         <button class="mobile-toggle" id="mobileToggle" aria-label="القائمة">
             <span></span><span></span><span></span>
         </button>
@@ -1164,10 +1194,10 @@
                     </div>
                 </div>
                 <div class="why-item reveal reveal-delay-2">
-                    <div class="why-icon"><i class="fas fa-hand-holding-medical"></i></div>
+                    <div class="why-icon"><i class="fas fa-tools"></i></div>
                     <div>
-                        <h4>استشارة طبية مجانية</h4>
-                        <p>فريقنا المتخصص يساعدك في اختيار المنتج المناسب لحالتك الصحية تماماً، مجاناً وبكل شفافية دون ضغط للشراء.</p>
+                        <h4>استشارة تقنية مجانية</h4>
+                        <p>فريقنا يساعدك في اختيار الجهاز المناسب ومواصفاته قبل الشراء، مجاناً وبكل شفافية ودون أي التزام.</p>
                     </div>
                 </div>
                 <div class="why-item reveal reveal-delay-3">
@@ -1302,11 +1332,11 @@
                 <h3>معلومات التواصل</h3>
                 <div class="contact-detail">
                     <div class="ci-icon"><i class="fas fa-map-marker-alt"></i></div>
-                    <span>نواكشوط، موريتانيا</span>
+                    <span id="cLocation">نواكشوط، موريتانيا</span>
                 </div>
                 <div class="contact-detail">
                     <div class="ci-icon"><i class="fas fa-phone"></i></div>
-                    <span dir="ltr">+222 32 22 22 06</span>
+                    <span dir="ltr" id="cPhone">+222 32 22 22 06</span>
                 </div>
                 <div class="contact-detail">
                     <div class="ci-icon"><i class="fab fa-facebook-f"></i></div>
@@ -1314,7 +1344,7 @@
                 </div>
                 <div class="contact-detail">
                     <div class="ci-icon"><i class="fas fa-clock"></i></div>
-                    <span>السبت - الخميس: 8:00 - 20:00</span>
+                    <span id="cHours">السبت - الخميس: 8:00 - 20:00</span>
                 </div>
                 <div class="wa-card">
                     <div class="wa-icon"><i class="fab fa-whatsapp"></i></div>
@@ -1387,8 +1417,8 @@
                 </ul>
                 <h4 style="margin-top:1.5rem;">اتصل بنا</h4>
                 <ul>
-                    <li><a href="https://wa.me/22232222206">+222 32 22 22 06</a></li>
-                    <li><a href="https://wa.me/22224555506">+222 24 55 55 06 (بلاغات)</a></li>
+                    <li><a id="footSalesNum" href="https://wa.me/22232222206">+222 32 22 22 06</a></li>
+                    <li><a id="footCompNum" href="https://wa.me/22224555506">+222 24 55 55 06 (بلاغات)</a></li>
                 </ul>
             </div>
         </div>
@@ -1585,5 +1615,338 @@
         'background:#080C0A;color:#C8A45C;padding:10px 18px;font-size:13px;border-radius:0 8px 8px 0;border:1px solid #C8A45C;'
     );
     </script>
+    <script>
+    /* ===== SENED_I18N_ENGINE: ترجمة ثلاثية + محتوى ديناميكي من قاعدة البيانات ===== */
+    (function () {
+        var SUPA = "https://tqzqdpofajovfzslehdv.supabase.co";
+        var KEY = "sb_publishable_ix1uiR2CJi1KqcElGnEWyA_rtead14k";
+        var LANG_KEY = "sened_lang";
+        var WA_ICON = '<i class="fab fa-whatsapp"></i> ';
 
-</body></html>
+        /* [المحدد، المفتاح، السمة (اختياري: ph=placeholder)] — عنصر واحد لكل مدخل */
+        var MAP = [
+            [".nav-links li:nth-child(1) a", "nav1"], [".nav-links li:nth-child(2) a", "nav2"],
+            [".nav-links li:nth-child(3) a", "nav3"], [".nav-links li:nth-child(4) a", "nav4"],
+            [".nav-links li:nth-child(5) a", "nav5"], [".nav-links li:nth-child(6) a", "nav6"],
+            [".nav-links li:nth-child(7) a", "navCta"],
+            [".mobile-menu ul li:nth-child(1) a", "nav1"], [".mobile-menu ul li:nth-child(2) a", "nav2"],
+            [".mobile-menu ul li:nth-child(3) a", "nav3"], [".mobile-menu ul li:nth-child(4) a", "nav4"],
+            [".mobile-menu ul li:nth-child(5) a", "nav5"], [".mobile-menu ul li:nth-child(6) a", "nav6"],
+            [".hero-title", "heroTitle"], [".hero-badge", "heroBadge"], [".hero-subtitle", "heroSub"],
+            [".hero-buttons a:nth-child(1)", "heroBtn1"], [".hero-buttons a:nth-child(2)", "heroBtn2"], [".hero-buttons a:nth-child(3)", "heroBtn3"],
+            [".scroll-indicator span", "discover"],
+            [".about-section .section-tag", "aboutTag"], [".about-section .section-title", "aboutTitle"],
+            [".about-content h3", "aboutH3"],
+            [".about-content > p:nth-of-type(1)", "aboutP1"], [".about-content > p:nth-of-type(2)", "aboutP2"],
+            [".about-trust .trust-badge:nth-child(1)", "trust1"], [".about-trust .trust-badge:nth-child(2)", "trust2"],
+            [".about-trust .trust-badge:nth-child(3)", "trust3"], [".about-trust .trust-badge:nth-child(4)", "trust4"],
+            [".stats-grid .stat-card:nth-child(1) .stat-lbl", "stat1"], [".stats-grid .stat-card:nth-child(2) .stat-lbl", "stat2"],
+            [".stats-grid .stat-card:nth-child(3) .stat-lbl", "stat3"], [".stats-grid .stat-card:nth-child(4) .stat-lbl", "stat4"],
+            [".about-badge .lbl", "stat1"],
+            [".products-section .section-tag", "prodTag"], [".products-section .section-title", "prodTitle"],
+            [".why-section .section-tag", "whyTag"], [".why-section .section-title", "whyTitle"],
+            [".why-list .why-item:nth-child(1) h4", "why1h"], [".why-list .why-item:nth-child(1) p", "why1p"],
+            [".why-list .why-item:nth-child(2) h4", "why2h"], [".why-list .why-item:nth-child(2) p", "why2p"],
+            [".why-list .why-item:nth-child(3) h4", "why3h"], [".why-list .why-item:nth-child(3) p", "why3p"],
+            [".why-list .why-item:nth-child(4) h4", "why4h"], [".why-list .why-item:nth-child(4) p", "why4p"],
+            [".cta-banner h2", "ctaH"], [".cta-inner > p", "ctaP"],
+            [".cta-buttons a:nth-child(1)", "ctaB1"], [".cta-buttons a:nth-child(2)", "ctaB2"],
+            [".complaints-section .section-tag", "compTag"], [".complaints-section .section-title", "compTitle"],
+            [".complaints-info h3", "compH3"],
+            [".complaints-info > p:nth-of-type(1)", "compP1"], [".complaints-info > p:nth-of-type(2)", "compP2"],
+            [".complaints-info .complaint-feature:nth-of-type(1) span", "compF1"],
+            [".complaints-info .complaint-feature:nth-of-type(2) span", "compF2"],
+            [".complaints-info .complaint-feature:nth-of-type(3) span", "compF3"],
+            [".complaint-form h4", "formH4"],
+            [".complaint-form .form-group:nth-of-type(1) label", "fName"], [".complaint-form .form-group:nth-of-type(1) input", "fNamePh", "ph"],
+            [".complaint-form .form-group:nth-of-type(2) label", "fPhone"],
+            [".complaint-form .form-group:nth-of-type(3) label", "fType"],
+            [".complaint-form select option:nth-child(1)", "opt0"], [".complaint-form select option:nth-child(2)", "opt1"],
+            [".complaint-form select option:nth-child(3)", "opt2"], [".complaint-form select option:nth-child(4)", "opt3"],
+            [".complaint-form select option:nth-child(5)", "opt4"], [".complaint-form select option:nth-child(6)", "opt5"],
+            [".complaint-form select option:nth-child(7)", "opt6"], [".complaint-form select option:nth-child(8)", "opt7"],
+            [".complaint-form select option:nth-child(9)", "opt8"],
+            [".complaint-form .form-group:nth-of-type(4) label", "fOrder"], [".complaint-form .form-group:nth-of-type(4) input", "fOrderPh", "ph"],
+            [".complaint-form .form-group:nth-of-type(5) label", "fDetails"], [".complaint-form .form-group:nth-of-type(5) textarea", "fDetailsPh", "ph"],
+            ['.complaint-form button[type="submit"]', "fSubmit"],
+            [".complaint-form .form-note", "fNote"],
+            [".contact-section .section-tag", "contTag"], [".contact-section .section-title", "contTitle"],
+            [".contact-info h3", "contH3"],
+            ['.contact-detail a[href*="facebook"]', "fbText"],
+            [".wa-card h4", "waH4"], [".wa-card div > p", "waP"], [".wa-card a", "waBtn"],
+            [".contact-form-wrap h4", "cfH4"],
+            [".contact-form input:nth-of-type(1)", "cfName", "ph"], [".contact-form input:nth-of-type(2)", "cfPhone", "ph"],
+            [".contact-form input:nth-of-type(3)", "cfSubject", "ph"], [".contact-form textarea", "cfMsg", "ph"],
+            [".contact-form button", "cfSubmit"],
+            [".footer-brand > p", "footP"], [".footer-cert span", "footCert"],
+            [".footer-grid > div:nth-child(2) h4", "footQuick"],
+            [".footer-grid > div:nth-child(2) ul li:nth-child(1) a", "nav1"], [".footer-grid > div:nth-child(2) ul li:nth-child(2) a", "nav2"],
+            [".footer-grid > div:nth-child(2) ul li:nth-child(3) a", "nav3"], [".footer-grid > div:nth-child(2) ul li:nth-child(4) a", "nav4"],
+            [".footer-grid > div:nth-child(2) ul li:nth-child(5) a", "nav5"], [".footer-grid > div:nth-child(2) ul li:nth-child(6) a", "nav6"],
+            [".footer-grid > div:nth-child(3) h4:nth-of-type(1)", "footFollow"],
+            [".footer-grid > div:nth-child(3) h4:nth-of-type(2)", "footCall"],
+            [".footer-grid > div:nth-child(3) ul:nth-of-type(1) li:nth-child(1) a", "footFb"],
+            [".footer-grid > div:nth-child(3) ul:nth-of-type(1) li:nth-child(2) a", "footWaSales"],
+            [".footer-grid > div:nth-child(3) ul:nth-of-type(1) li:nth-child(3) a", "footWaComp"],
+            [".footer-bottom p:nth-of-type(1)", "footBottom"],
+            [".wa-float .wa-tooltip", "waTip"]
+        ];
+
+        var TR = {
+            fr: {
+                nav1: "Accueil", nav2: "Qui sommes-nous", nav3: "Nos produits", nav4: "Pourquoi Sened", nav5: "Réclamations", nav6: "Contact",
+                navCta: "WhatsApp 💬",
+                heroTitle: '<span class="gold-text">Sened</span> Équipement Médical<br>Nouakchott · Mauritanie',
+                heroBadge: "✦ Le partenaire médical de confiance en Mauritanie",
+                heroSub: "Nous fournissons les meilleurs équipements médicaux pour le domicile et les hôpitaux — fauteuils roulants, appareils respiratoires, lits médicaux et matériel de rééducation — avec garantie de qualité et service après-vente.",
+                heroBtn1: 'Découvrir nos produits <i class="fas fa-arrow-right"></i>',
+                heroBtn2: WA_ICON + "Commander",
+                heroBtn3: 'Qui sommes-nous <i class="fas fa-info-circle"></i>',
+                discover: "DÉCOUVRIR",
+                aboutTag: "✦ Qui sommes-nous", aboutTitle: 'Notre mission : les soins <span class="gold-text">commencent à la maison</span>',
+                aboutH3: "Plus qu'un magasin — votre partenaire santé",
+                aboutP1: "« Sened » porte bien son nom : être votre soutien et celui de votre famille sur le chemin de la santé et du rétablissement. Fondés à Nouakchott, nous sommes la première destination pour des équipements médicaux de haute qualité à des prix accessibles.",
+                aboutP2: "Chaque patient mérite les meilleurs outils pour sa santé, à la maison, en clinique ou à l'hôpital. Notre équipe vous accompagne du choix jusqu'à la bonne utilisation, avec un service après-vente complet.",
+                trust1: '<i class="fas fa-shield-alt"></i> Qualité garantie', trust2: '<i class="fas fa-headset"></i> Support continu',
+                trust3: '<i class="fas fa-truck"></i> Livraison rapide', trust4: '<i class="fas fa-certificate"></i> Produits certifiés',
+                stat1: "Clients satisfaits", stat2: "Produits disponibles", stat3: "% Satisfaction client", stat4: "Années d'expérience",
+                prodTag: "✦ Nos produits", prodTitle: 'Équipements médicaux <span class="gold-text">pour chaque besoin</span>',
+                whyTag: "✦ Pourquoi Sened ?", whyTitle: 'Parce que votre confiance <span class="gold-text">mérite le meilleur</span>',
+                why1h: "Qualité certifiée internationalement",
+                why1p: "Tous nos produits portent des certifications internationales et répondent à des normes strictes. La qualité n'est pas une option, c'est un engagement.",
+                why2h: "Conseil technique gratuit",
+                why2p: "Notre équipe vous aide à choisir l'appareil adapté et ses spécifications avant l'achat, gratuitement, en toute transparence et sans engagement.",
+                why3h: "Livraison rapide à Nouakchott",
+                why3p: "Livraison en moins de 24h à Nouakchott, avec possibilité de livraison dans les autres wilayas en quelques jours.",
+                why4h: "Maintenance et service après-vente",
+                why4p: "Votre parcours ne s'arrête pas à l'achat. Nous assurons la maintenance périodique et les pièces de rechange d'origine pour garantir le bon fonctionnement de votre appareil.",
+                ctaH: "Besoin d'un équipement médical maintenant ?",
+                ctaP: "N'attendez pas pour offrir le confort à vos proches. Contactez-nous pour un conseil gratuit et un devis spécial.",
+                ctaB1: WA_ICON + "Démarrer la conversation",
+                ctaB2: 'Voir les produits <i class="fas fa-arrow-right"></i>',
+                compTag: "✦ Réclamations", compTitle: 'Votre voix <span class="gold-text">fait la différence</span>',
+                compH3: "Nous vous écoutons et progressons ensemble",
+                compP1: "Chez Sened, votre satisfaction n'est pas une fin mais un point de départ. Chaque remarque ou réclamation est une occasion en or d'améliorer nos services.",
+                compP2: "Nous nous engageons à traiter chaque réclamation en moins de 48 heures ouvrables, avec un suivi continu jusqu'à la résolution complète.",
+                compF1: "Réponse garantie sous 48 heures ouvrables",
+                compF2: "Confidentialité totale de vos données",
+                compF3: "Suivi continu jusqu'à la résolution définitive",
+                formH4: '<i class="fas fa-flag"></i> Déposer une réclamation',
+                fName: "Nom complet", fNamePh: "Entrez votre nom complet",
+                fPhone: "Numéro de téléphone", fType: "Type de réclamation",
+                opt0: "Choisissez le type", opt1: "Produit défectueux ou endommagé", opt2: "Retard de livraison",
+                opt3: "Problème de maintenance", opt4: "Mauvais traitement du personnel", opt5: "Produit non conforme à la description",
+                opt6: "Remboursement ou échange", opt7: "Suggestion d'amélioration", opt8: "Autre",
+                fOrder: "N° de commande (optionnel)", fOrderPh: "Numéro de commande si disponible",
+                fDetails: "Détails de la réclamation", fDetailsPh: "Expliquez-nous ce qui s'est passé en détail pour mieux vous aider...",
+                fSubmit: 'Envoyer <i class="fas fa-paper-plane"></i>',
+                fNote: '<i class="fas fa-info-circle"></i> Votre réclamation sera transmise directement via WhatsApp à notre service client pour une réponse rapide.',
+                contTag: "✦ Contact", contTitle: 'Nous sommes là <span class="gold-text">pour vous aider</span>',
+                contH3: "Informations de contact",
+                fbText: "Notre page Facebook",
+                waH4: "WhatsApp Ventes", waP: "Pour les commandes et renseignements produits",
+                waBtn: WA_ICON + "Démarrer la conversation",
+                cfH4: '<i class="fas fa-envelope-open-text"></i> Envoyez votre message',
+                cfName: "Nom complet", cfPhone: "Numéro de téléphone", cfSubject: "Sujet", cfMsg: "Votre message...",
+                cfSubmit: 'Envoyer <i class="fas fa-paper-plane"></i>',
+                footP: "Nouakchott, Mauritanie — votre partenaire médical de confiance. Les meilleurs équipements médicaux pour le domicile et les hôpitaux, avec un service après-vente complet.",
+                footCert: "Produits certifiés et qualité garantie",
+                footQuick: "Liens rapides", footFollow: "Suivez-nous", footCall: "Contactez-nous",
+                footFb: "Facebook", footWaSales: "WhatsApp Ventes", footWaComp: "WhatsApp Réclamations",
+                footBottom: "© 2026 Sened Équipement Médical · Nouakchott, Mauritanie · Tous droits réservés",
+                waTip: "Contactez-nous sur WhatsApp",
+                inquire: 'Demander <i class="fab fa-whatsapp"></i>', waAsk: "Bonjour, je voudrais des informations sur ", compSuffix: " (réclamations)"
+            },
+            en: {
+                nav1: "Home", nav2: "About Us", nav3: "Our Products", nav4: "Why Sened", nav5: "Complaints", nav6: "Contact",
+                navCta: "WhatsApp 💬",
+                heroTitle: '<span class="gold-text">Sened</span> Medical Equipment<br>Nouakchott · Mauritania',
+                heroBadge: "✦ Mauritania's Trusted Medical Partner",
+                heroSub: "We provide the finest home and hospital medical equipment — from wheelchairs and respiratory devices to medical beds and physiotherapy tools — with quality guarantee and after-sales service.",
+                heroBtn1: 'Explore Our Products <i class="fas fa-arrow-right"></i>',
+                heroBtn2: WA_ICON + "Order Now",
+                heroBtn3: 'About Us <i class="fas fa-info-circle"></i>',
+                discover: "DISCOVER",
+                aboutTag: "✦ About Us", aboutTitle: 'Our mission: care <span class="gold-text">starts at home</span>',
+                aboutH3: "More than a store — your health partner",
+                aboutP1: "“Sened” lives up to its name: being a support for you and your family on the journey of health and recovery. Founded in Nouakchott, we are the first destination for high-quality medical equipment at prices for everyone.",
+                aboutP2: "Every patient deserves the best tools for their health — at home, in the clinic or in hospital. Our team walks with you from selection to proper use, with full after-sales service.",
+                trust1: '<i class="fas fa-shield-alt"></i> Quality Guarantee', trust2: '<i class="fas fa-headset"></i> Continuous Support',
+                trust3: '<i class="fas fa-truck"></i> Fast Delivery', trust4: '<i class="fas fa-certificate"></i> Certified Products',
+                stat1: "Happy Clients", stat2: "Products Available", stat3: "% Client Satisfaction", stat4: "Years of Experience",
+                prodTag: "✦ Our Products", prodTitle: 'Medical equipment <span class="gold-text">for every need</span>',
+                whyTag: "✦ Why Sened?", whyTitle: 'Because your trust <span class="gold-text">deserves the best</span>',
+                why1h: "Internationally Certified Quality",
+                why1p: "All our products carry international quality certifications and meet strict standards before reaching you. Quality is not an option — it's a commitment.",
+                why2h: "Free Technical Consultation",
+                why2p: "Our team helps you choose the right device and its specifications before buying — free, transparent and with no obligation.",
+                why3h: "Fast Delivery in Nouakchott",
+                why3p: "We deliver within 24 hours in Nouakchott, with delivery to other regions within a few days.",
+                why4h: "Maintenance & After-Sales Service",
+                why4p: "Your journey doesn't end at purchase. We provide periodic maintenance and original spare parts to keep your device at its best.",
+                ctaH: "Need medical equipment now?",
+                ctaP: "Don't delay your loved ones' comfort. Contact us now for free advice and a special quote.",
+                ctaB1: WA_ICON + "Start the Conversation",
+                ctaB2: 'Browse Products <i class="fas fa-arrow-right"></i>',
+                compTag: "✦ Complaints", compTitle: 'Your voice <span class="gold-text">makes the difference</span>',
+                compH3: "We listen and improve together",
+                compP1: "At Sened, your satisfaction is not a finish line but a starting point. Every remark or complaint is a golden opportunity to improve our services.",
+                compP2: "We commit to handling every complaint within 48 working hours, with continuous follow-up until full resolution.",
+                compF1: "Guaranteed response within 48 working hours",
+                compF2: "Full confidentiality of your data",
+                compF3: "Continuous follow-up until final resolution",
+                formH4: '<i class="fas fa-flag"></i> Submit a Complaint',
+                fName: "Full Name", fNamePh: "Enter your full name",
+                fPhone: "Phone Number", fType: "Complaint Type",
+                opt0: "Choose the type", opt1: "Defective or damaged product", opt2: "Delivery delay",
+                opt3: "Maintenance issue", opt4: "Staff misconduct", opt5: "Product doesn't match description",
+                opt6: "Refund or exchange", opt7: "Service improvement suggestion", opt8: "Other",
+                fOrder: "Order No. (optional)", fOrderPh: "Order number if available",
+                fDetails: "Complaint Details", fDetailsPh: "Tell us what happened in detail so we can help you better...",
+                fSubmit: 'Send <i class="fas fa-paper-plane"></i>',
+                fNote: '<i class="fas fa-info-circle"></i> Your complaint will be sent directly via WhatsApp to our customer service team for the fastest response.',
+                contTag: "✦ Contact Us", contTitle: 'We are always here <span class="gold-text">to help you</span>',
+                contH3: "Contact Information",
+                fbText: "Our Facebook page",
+                waH4: "Sales WhatsApp", waP: "For orders and product inquiries",
+                waBtn: WA_ICON + "Start the Conversation",
+                cfH4: '<i class="fas fa-envelope-open-text"></i> Send Your Message',
+                cfName: "Full name", cfPhone: "Phone number", cfSubject: "Subject", cfMsg: "Your message...",
+                cfSubmit: 'Send <i class="fas fa-paper-plane"></i>',
+                footP: "Nouakchott, Mauritania — your trusted medical partner. The finest home and hospital medical equipment with full after-sales service.",
+                footCert: "Certified products with guaranteed quality",
+                footQuick: "Quick Links", footFollow: "Follow Us", footCall: "Call Us",
+                footFb: "Facebook", footWaSales: "Sales WhatsApp", footWaComp: "Complaints WhatsApp",
+                footBottom: "© 2026 Sened Medical Equipment · Nouakchott, Mauritania · All rights reserved",
+                waTip: "Chat with us on WhatsApp",
+                inquire: 'Inquire Now <i class="fab fa-whatsapp"></i>', waAsk: "Hello, I would like to ask about ", compSuffix: " (complaints)"
+            }
+        };
+        var AR_EXTRA = { inquire: 'استفسر الآن <i class="fab fa-whatsapp"></i>', waAsk: "أريد الاستفسار عن ", compSuffix: " (بلاغات)" };
+
+        /* التقاط النصوص العربية الأصلية من الصفحة */
+        var AR = {};
+        MAP.forEach(function (e) {
+            if (AR[e[1]] != null) return;
+            var el = document.querySelector(e[0]);
+            if (!el) return;
+            AR[e[1]] = e[2] === "ph" ? (el.getAttribute("placeholder") || "") : el.innerHTML;
+        });
+
+        var SD = null; /* بيانات قاعدة البيانات */
+        var lang = "ar";
+        try { lang = localStorage.getItem(LANG_KEY) || "ar"; } catch (e) {}
+        if (!/^(ar|fr|en)$/.test(lang)) lang = "ar";
+
+        function tx(key) {
+            if (lang === "ar") return AR[key] != null ? AR[key] : AR_EXTRA[key];
+            var d = TR[lang] || {};
+            return d[key] != null ? d[key] : (AR[key] != null ? AR[key] : AR_EXTRA[key]);
+        }
+        function lv(v) { /* قيمة قد تكون نصاً أو {ar,fr,en} */
+            if (v && typeof v === "object") return v[lang] || v.ar || "";
+            return v || "";
+        }
+        function fmtNum(n) {
+            n = String(n || "").replace(/[^0-9]/g, "");
+            if (n.length < 8) return "+" + n;
+            return "+" + n.slice(0, 3) + " " + (n.slice(3).match(/.{1,2}/g) || []).join(" ");
+        }
+        function esc(s) { var d = document.createElement("div"); d.textContent = s == null ? "" : s; return d.innerHTML; }
+
+        function applyStatic() {
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+            MAP.forEach(function (e) {
+                var el = document.querySelector(e[0]);
+                if (!el) return;
+                var val = tx(e[1]);
+                if (val == null) return;
+                if (e[2] === "ph") el.setAttribute("placeholder", val);
+                else el.innerHTML = val;
+            });
+            document.querySelectorAll(".lang-btn-s").forEach(function (b) {
+                b.classList.toggle("active", b.dataset.lang === lang);
+            });
+        }
+
+        function applyDynamic() {
+            if (!SD) return;
+            if (SD.hero) {
+                var b = document.querySelector(".hero-badge"), s = document.querySelector(".hero-subtitle");
+                if (b && SD.hero.badge) b.textContent = lv(SD.hero.badge);
+                if (s && SD.hero.subtitle) s.textContent = lv(SD.hero.subtitle);
+            }
+            if (SD.stats) {
+                var vals = [SD.stats.clients, SD.stats.products, SD.stats.satisfaction, SD.stats.years];
+                document.querySelectorAll(".stat-num[data-count]").forEach(function (el, i) {
+                    if (vals[i] != null) {
+                        el.dataset.count = vals[i];
+                        if (el.textContent !== "0") el.textContent = vals[i] + (vals[i] >= 98 ? "%" : "+");
+                    }
+                });
+                var ab = document.querySelector(".about-badge .num");
+                if (ab && SD.stats.clients != null) ab.textContent = SD.stats.clients + "+";
+            }
+            var ct = SD.contact || {};
+            var salesWa = ct.salesWa || "22232222206";
+            if (Array.isArray(SD.products) && SD.products.length) {
+                var grid = document.querySelector(".products-grid");
+                grid.innerHTML = SD.products.map(function (p, i) {
+                    var waTxt = encodeURIComponent(tx("waAsk") + lv(p.title));
+                    return '<div class="product-card reveal active reveal-delay-' + ((i % 3) + 1) + '">' +
+                        '<div class="product-icon"><i class="fas ' + esc(p.icon || "fa-briefcase-medical") + '"></i></div>' +
+                        '<h3>' + esc(lv(p.title)) + '</h3>' +
+                        '<p>' + esc(lv(p.desc)) + '</p>' +
+                        '<a href="https://wa.me/' + salesWa + '?text=' + waTxt + '" target="_blank" class="product-cta">' + tx("inquire") + '</a>' +
+                        '</div>';
+                }).join("");
+            }
+            if (ct.salesWa) {
+                document.querySelectorAll('a[href*="wa.me/"]').forEach(function (a) {
+                    if (a.href.indexOf("22224555506") === -1 && /wa\.me\/222/.test(a.href)) {
+                        a.href = a.href.replace(/wa\.me\/[0-9]+/, "wa.me/" + ct.salesWa);
+                    }
+                });
+                var fs = document.getElementById("footSalesNum");
+                if (fs) { fs.href = "https://wa.me/" + ct.salesWa; fs.textContent = fmtNum(ct.salesWa); }
+            }
+            if (ct.complaintsWa) {
+                document.querySelectorAll('a[href*="wa.me/22224555506"]').forEach(function (a) {
+                    a.href = a.href.replace("22224555506", ct.complaintsWa);
+                });
+                var fc = document.getElementById("footCompNum");
+                if (fc) { fc.href = "https://wa.me/" + ct.complaintsWa; fc.textContent = fmtNum(ct.complaintsWa) + tx("compSuffix"); }
+            }
+            var p = document.getElementById("cPhone"); if (p && ct.phone) p.textContent = fmtNum(ct.phone);
+            var h = document.getElementById("cHours"); if (h && ct.hours) h.textContent = lv(ct.hours);
+            var l = document.getElementById("cLocation"); if (l && ct.location) l.textContent = lv(ct.location);
+            if (ct.facebook) {
+                document.querySelectorAll('a[href*="facebook.com"]').forEach(function (a) { a.href = ct.facebook; });
+            }
+        }
+
+        function applyAll() { applyStatic(); applyDynamic(); }
+
+        document.querySelectorAll(".lang-btn-s").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+                if (btn.dataset.lang === lang) return;
+                lang = btn.dataset.lang;
+                try { localStorage.setItem(LANG_KEY, lang); } catch (e) {}
+                applyAll();
+            });
+        });
+
+        if (lang !== "ar") applyStatic();
+
+        fetch(SUPA + "/rest/v1/site_data?id=eq.2&select=data", { headers: { apikey: KEY } })
+            .then(function (r) { return r.ok ? r.json() : []; })
+            .then(function (rows) {
+                SD = rows && rows[0] && rows[0].data;
+                if (SD) applyDynamic();
+            })
+            .catch(function () { /* لا إنترنت — تبقى النسخة الثابتة */ });
+    })();
+    </script>
+</body>
+</html>

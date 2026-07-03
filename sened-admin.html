@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>لوحة إدارة سند للمعدات الطبية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root{
+  --gold:#C8A45C;--gold-light:#E8C87A;--gold-dark:#8B6914;
+  --bg:#080C0A;--bg2:#0E1410;--card:#0D1310;--line:rgba(200,164,92,.18);
+  --line-strong:rgba(200,164,92,.5);--ink:#E8EDE9;--muted:#8A9E90;
+  --danger:#e0566e;--ok:#2d8c5c;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);line-height:1.7;min-height:100vh}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{
+  width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:12px;
+  padding:11px 14px;color:var(--ink);font-family:inherit;font-size:.93rem;outline:none;
+  transition:border-color .3s,box-shadow .3s;resize:vertical;
+}
+input:focus,select:focus,textarea:focus{border-color:var(--line-strong);box-shadow:0 0 24px rgba(200,164,92,.12)}
+select option{background:var(--bg2)}
+label{display:block;font-size:.8rem;color:var(--muted);margin-bottom:6px;font-weight:600}
+.field{margin-bottom:14px}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:11px 22px;border-radius:50px;font-weight:700;font-size:.9rem;border:none;
+  transition:transform .25s,box-shadow .25s,opacity .25s;text-decoration:none;
+}
+.btn:hover{transform:translateY(-2px)}
+.btn-gold{background:linear-gradient(135deg,var(--gold-dark),var(--gold));color:#000;box-shadow:0 6px 22px rgba(200,164,92,.3)}
+.btn-ghost{background:transparent;color:var(--gold-light);border:1px solid var(--line-strong)}
+.btn-danger{background:rgba(224,86,110,.12);color:var(--danger);border:1px solid rgba(224,86,110,.4)}
+.btn-sm{padding:7px 16px;font-size:.8rem}
+
+/* ===== بوابة الدخول ===== */
+#loginView{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at 30% 10%,rgba(200,164,92,.1),transparent 55%),var(--bg);z-index:100;padding:20px}
+.login-card{
+  width:min(420px,94vw);background:var(--card);border:1px solid var(--line);
+  border-radius:24px;padding:40px 32px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.6);
+}
+.login-logo{
+  width:76px;height:76px;margin:0 auto 16px;border-radius:50%;
+  background:linear-gradient(135deg,var(--gold-dark),var(--gold));
+  display:flex;align-items:center;justify-content:center;font-size:1.9rem;color:#000;
+  box-shadow:0 0 50px rgba(200,164,92,.35);
+  animation:logo3dS 8s ease-in-out infinite;
+}
+@keyframes logo3dS{0%,100%{transform:perspective(600px) rotateY(-15deg) rotateX(4deg)}50%{transform:perspective(600px) rotateY(15deg) rotateX(-4deg)}}
+.login-card h1{font-size:1.25rem;font-weight:800;margin-bottom:2px}
+.login-card .sub{color:var(--muted);font-size:.83rem;margin-bottom:24px}
+.login-card form{text-align:start}
+#loginError{color:var(--danger);font-size:.82rem;margin-top:10px;display:none;text-align:center}
+.first-time{margin-top:16px;padding-top:14px;border-top:1px dashed var(--line);text-align:center}
+.first-time div{font-size:.76rem;color:var(--muted);margin-bottom:8px}
+
+/* ===== اللوحة ===== */
+#adminView{display:none}
+.topbar{
+  background:var(--bg2);border-bottom:1px solid var(--line);
+  padding:14px 0;position:sticky;top:0;z-index:50;
+}
+.wrap{width:min(1080px,94%);margin-inline:auto}
+.topbar .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.tb-brand{display:flex;align-items:center;gap:12px}
+.tb-logo{
+  width:42px;height:42px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--gold-dark),var(--gold));
+  display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:#000;
+}
+.tb-brand b{font-size:1.02rem}
+.tb-brand small{display:block;font-size:.68rem;color:var(--gold);letter-spacing:2px}
+.tb-actions{display:flex;gap:10px;flex-wrap:wrap}
+main{padding:26px 0 60px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+.tab-btn{
+  padding:10px 20px;border-radius:50px;border:1px solid var(--line);
+  background:transparent;color:var(--muted);font-weight:700;font-size:.88rem;transition:all .3s;
+}
+.tab-btn.active{background:rgba(200,164,92,.14);border-color:var(--line-strong);color:var(--gold-light)}
+.tab-panel{display:none}
+.tab-panel.active{display:block;animation:fadeIn .35s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.card{
+  background:var(--card);border:1px solid var(--line);border-radius:20px;
+  padding:26px;margin-bottom:18px;
+}
+.card h2{font-size:1.15rem;font-weight:800;margin-bottom:4px}
+.card-sub{color:var(--muted);font-size:.83rem;margin-bottom:20px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media (max-width:820px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
+.lang-tag{
+  display:inline-block;font-size:.68rem;font-weight:800;padding:1px 9px;border-radius:999px;
+  background:rgba(200,164,92,.14);color:var(--gold-light);margin-inline-start:6px;letter-spacing:1px;
+}
+
+/* منتج */
+.prod-row{
+  border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:14px;
+  background:var(--bg2);
+}
+.prod-head{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.prod-ico{
+  width:46px;height:46px;border-radius:50%;flex-shrink:0;font-size:1.15rem;
+  background:linear-gradient(135deg,rgba(200,164,92,.15),rgba(200,164,92,.3));
+  color:var(--gold);display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--line);
+}
+.prod-head b{flex:1;font-size:.95rem}
+.prod-head select{width:220px}
+@media (max-width:640px){.prod-head{flex-wrap:wrap}.prod-head select{width:100%}}
+#toast{
+  position:fixed;bottom:26px;inset-inline-start:50%;transform:translate(50%,80px);
+  background:var(--card);border:1px solid var(--line-strong);color:var(--ink);
+  padding:13px 26px;border-radius:50px;font-size:.9rem;z-index:400;
+  opacity:0;transition:all .4s cubic-bezier(.22,.61,.36,1);box-shadow:0 16px 50px rgba(0,0,0,.5);
+  max-width:90vw;text-align:center;
+}
+#toast.show{opacity:1;transform:translate(50%,0)}
+#toast.ok{border-color:rgba(45,140,92,.6)}
+#toast.err{border-color:rgba(224,86,110,.6)}
+.save-bar{position:sticky;bottom:18px;text-align:center;margin-top:8px}
+.save-bar .btn{min-width:260px;box-shadow:0 14px 44px rgba(0,0,0,.55),0 6px 22px rgba(200,164,92,.3)}
+</style>
+</head>
+<body>
+
+<!-- ===== بوابة الدخول ===== -->
+<div id="loginView">
+  <div class="login-card">
+    <div class="login-logo"><i class="fas fa-briefcase-medical"></i></div>
+    <h1>لوحة إدارة سند</h1>
+    <div class="sub">سند للمعدات الطبية — منطقة الإدارة</div>
+    <form id="loginForm">
+      <div class="field">
+        <label for="loginPass">كلمة المرور</label>
+        <input type="password" id="loginPass" placeholder="نفس كلمة مرور لوحة Rim Medical" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="btn btn-gold" style="width:100%">دخول</button>
+      <div id="loginError">كلمة المرور غير صحيحة</div>
+      <div class="first-time">
+        <div>هذه اللوحة تستخدم نفس حسابك — إن لم تنشئ كلمة مرورك بعد فافعل ذلك من لوحة Rim Medical أولاً</div>
+        <a class="btn btn-ghost btn-sm" href="admin.html" target="_blank" rel="noopener">فتح لوحة Rim Medical</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===== اللوحة ===== -->
+<div id="adminView">
+  <div class="topbar">
+    <div class="wrap">
+      <div class="tb-brand">
+        <span class="tb-logo"><i class="fas fa-briefcase-medical"></i></span>
+        <div><b>لوحة إدارة سند</b><small>SENED MEDICAL</small></div>
+      </div>
+      <div class="tb-actions">
+        <a href="sened.html" target="_blank" class="btn btn-ghost btn-sm">👁️ معاينة الموقع</a>
+        <button class="btn btn-ghost btn-sm" id="logoutBtn">خروج 🚪</button>
+      </div>
+    </div>
+  </div>
+
+  <main class="wrap">
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="products">🛒 المنتجات</button>
+      <button class="tab-btn" data-tab="stats">📊 الإحصائيات</button>
+      <button class="tab-btn" data-tab="contact">📞 التواصل</button>
+      <button class="tab-btn" data-tab="hero">🏠 الواجهة</button>
+    </div>
+
+    <!-- المنتجات -->
+    <div class="tab-panel active" id="tab-products">
+      <div class="card">
+        <h2>فئات المنتجات</h2>
+        <div class="card-sub">الموقع ثلاثي اللغات — اكتب الاسم والوصف بالعربية والفرنسية والإنجليزية. كل حفظ يُنشر فوراً للزوار</div>
+        <div id="prodList"></div>
+        <button class="btn btn-ghost" id="addProdBtn">＋ إضافة فئة منتجات</button>
+      </div>
+    </div>
+
+    <!-- الإحصائيات -->
+    <div class="tab-panel" id="tab-stats">
+      <div class="card">
+        <h2>أرقام الإحصائيات</h2>
+        <div class="card-sub">الأرقام التي تظهر في قسم "من نحن" (تُعرض بحركة عدّ تصاعدي)</div>
+        <div class="grid-4">
+          <div class="field"><label>عميل راضٍ</label><input type="number" id="stClients" min="0"></div>
+          <div class="field"><label>منتج متاح</label><input type="number" id="stProducts" min="0"></div>
+          <div class="field"><label>% رضا العملاء</label><input type="number" id="stSatisfaction" min="0" max="100"></div>
+          <div class="field"><label>سنوات خبرة</label><input type="number" id="stYears" min="0"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- التواصل -->
+    <div class="tab-panel" id="tab-contact">
+      <div class="card">
+        <h2>أرقام وروابط التواصل</h2>
+        <div class="card-sub">الأرقام بالصيغة الدولية بدون + (مثال: 22232222206)</div>
+        <div class="grid-2">
+          <div class="field"><label>واتساب المبيعات (كل أزرار الطلب)</label><input type="text" id="ctSalesWa" dir="ltr" inputmode="numeric"></div>
+          <div class="field"><label>واتساب البلاغات والشكاوى</label><input type="text" id="ctCompWa" dir="ltr" inputmode="numeric"></div>
+          <div class="field"><label>رقم الهاتف المعروض</label><input type="text" id="ctPhone" dir="ltr" inputmode="numeric"></div>
+          <div class="field"><label>رابط صفحة فيسبوك</label><input type="url" id="ctFacebook" dir="ltr" placeholder="https://facebook.com/..."></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>ساعات العمل والموقع</h2>
+        <div class="card-sub">بالثلاث لغات</div>
+        <div class="grid-3">
+          <div class="field"><label>ساعات العمل <span class="lang-tag">AR</span></label><input type="text" id="ctHoursAr"></div>
+          <div class="field"><label>Horaires <span class="lang-tag">FR</span></label><input type="text" id="ctHoursFr" dir="ltr"></div>
+          <div class="field"><label>Working hours <span class="lang-tag">EN</span></label><input type="text" id="ctHoursEn" dir="ltr"></div>
+          <div class="field"><label>الموقع <span class="lang-tag">AR</span></label><input type="text" id="ctLocAr"></div>
+          <div class="field"><label>Localisation <span class="lang-tag">FR</span></label><input type="text" id="ctLocFr" dir="ltr"></div>
+          <div class="field"><label>Location <span class="lang-tag">EN</span></label><input type="text" id="ctLocEn" dir="ltr"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- الواجهة -->
+    <div class="tab-panel" id="tab-hero">
+      <div class="card">
+        <h2>نصوص الواجهة الرئيسية</h2>
+        <div class="card-sub">الشارة والوصف الظاهران أعلى الموقع — بالثلاث لغات</div>
+        <div class="grid-3">
+          <div class="field"><label>الشارة <span class="lang-tag">AR</span></label><input type="text" id="hBadgeAr" maxlength="90"></div>
+          <div class="field"><label>Badge <span class="lang-tag">FR</span></label><input type="text" id="hBadgeFr" dir="ltr" maxlength="90"></div>
+          <div class="field"><label>Badge <span class="lang-tag">EN</span></label><input type="text" id="hBadgeEn" dir="ltr" maxlength="90"></div>
+        </div>
+        <div class="field"><label>الوصف التعريفي <span class="lang-tag">AR</span></label><textarea id="hSubAr" maxlength="320" style="min-height:80px"></textarea></div>
+        <div class="field"><label>Description <span class="lang-tag">FR</span></label><textarea id="hSubFr" dir="ltr" maxlength="320" style="min-height:80px"></textarea></div>
+        <div class="field"><label>Description <span class="lang-tag">EN</span></label><textarea id="hSubEn" dir="ltr" maxlength="320" style="min-height:80px"></textarea></div>
+      </div>
+    </div>
+
+    <div class="save-bar">
+      <button class="btn btn-gold" id="saveBtn">💾 حفظ ونشر لكل الزوار</button>
+    </div>
+  </main>
+</div>
+
+<div id="toast"></div>
+
+<script src="data.js"></script>
+<script src="store.js"></script>
+<script>
+"use strict";
+const $ = (s, ctx) => (ctx || document).querySelector(s);
+const $$ = (s, ctx) => Array.from((ctx || document).querySelectorAll(s));
+const esc = (s) => { const d = document.createElement("div"); d.textContent = s ?? ""; return d.innerHTML; };
+
+/* أيقونات المنتجات المتاحة */
+const ICONS = [
+  ["fa-wheelchair", "كرسي متحرك"], ["fa-bed", "سرير طبي"], ["fa-lungs", "تنفس وأكسجين"],
+  ["fa-walking", "مشي وتنقل"], ["fa-heartbeat", "قياس ومراقبة"], ["fa-dumbbell", "علاج طبيعي"],
+  ["fa-syringe", "حقن ومحاليل"], ["fa-stethoscope", "سماعة طبية"], ["fa-kit-medical", "إسعافات أولية"],
+  ["fa-tooth", "أسنان"], ["fa-eye", "عيون"], ["fa-baby", "أطفال وحديثي الولادة"],
+  ["fa-hand-holding-medical", "رعاية منزلية"], ["fa-flask", "مختبرات"], ["fa-briefcase-medical", "معدات عامة"]
+];
+
+let SDATA = null;
+
+let toastTimer;
+function toast(msg, type) {
+  const el = $("#toast");
+  el.textContent = msg;
+  el.className = type || "";
+  el.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove("show"), 3200);
+}
+
+/* نص قد يكون قديماً (نص مفرد) أو ثلاثي اللغات */
+const L = (v) => (v && typeof v === "object") ? v : { ar: v || "", fr: "", en: "" };
+
+/* ===== الدخول (نفس حساب Rim Medical) ===== */
+function showAdmin() {
+  $("#loginView").style.display = "none";
+  $("#adminView").style.display = "block";
+  loadData();
+}
+$("#loginForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  try {
+    await RimStore.signIn($("#loginPass").value);
+    showAdmin();
+  } catch (err) {
+    const el = $("#loginError");
+    el.textContent = err.message;
+    el.style.display = "block";
+    $("#loginPass").value = "";
+  }
+});
+$("#logoutBtn").addEventListener("click", () => { RimStore.signOut(); location.reload(); });
+if (RimStore.getSession()) showAdmin();
+
+/* ===== التبويبات ===== */
+$$(".tab-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    $$(".tab-btn").forEach(b => b.classList.toggle("active", b === btn));
+    $$(".tab-panel").forEach(p => p.classList.toggle("active", p.id === "tab-" + btn.dataset.tab));
+  });
+});
+
+/* ===== تحميل البيانات ===== */
+async function loadData() {
+  try {
+    const r = await fetch(RimStore.SUPA_URL + "/rest/v1/site_data?id=eq.2&select=data", { headers: { apikey: RimStore.SUPA_KEY } });
+    const rows = await r.json();
+    SDATA = (rows && rows[0] && rows[0].data) || {};
+  } catch (e) {
+    SDATA = {};
+    toast("⚠️ تعذّر تحميل البيانات — تحقق من الإنترنت", "err");
+  }
+  /* ترقية أي نصوص قديمة إلى الشكل ثلاثي اللغات */
+  SDATA.stats = SDATA.stats || { clients: 500, products: 80, satisfaction: 98, years: 5 };
+  SDATA.contact = SDATA.contact || {};
+  SDATA.contact.hours = L(SDATA.contact.hours);
+  SDATA.contact.location = L(SDATA.contact.location);
+  SDATA.hero = SDATA.hero || {};
+  SDATA.hero.badge = L(SDATA.hero.badge);
+  SDATA.hero.subtitle = L(SDATA.hero.subtitle);
+  SDATA.products = (SDATA.products || []).map(p => ({ icon: p.icon || "fa-briefcase-medical", title: L(p.title), desc: L(p.desc) }));
+  renderAll();
+}
+
+function renderAll() {
+  renderProducts();
+  $("#stClients").value = SDATA.stats.clients ?? "";
+  $("#stProducts").value = SDATA.stats.products ?? "";
+  $("#stSatisfaction").value = SDATA.stats.satisfaction ?? "";
+  $("#stYears").value = SDATA.stats.years ?? "";
+  const ct = SDATA.contact;
+  $("#ctSalesWa").value = ct.salesWa || "";
+  $("#ctCompWa").value = ct.complaintsWa || "";
+  $("#ctPhone").value = ct.phone || "";
+  $("#ctFacebook").value = ct.facebook || "";
+  $("#ctHoursAr").value = ct.hours.ar || ""; $("#ctHoursFr").value = ct.hours.fr || ""; $("#ctHoursEn").value = ct.hours.en || "";
+  $("#ctLocAr").value = ct.location.ar || ""; $("#ctLocFr").value = ct.location.fr || ""; $("#ctLocEn").value = ct.location.en || "";
+  $("#hBadgeAr").value = SDATA.hero.badge.ar || ""; $("#hBadgeFr").value = SDATA.hero.badge.fr || ""; $("#hBadgeEn").value = SDATA.hero.badge.en || "";
+  $("#hSubAr").value = SDATA.hero.subtitle.ar || ""; $("#hSubFr").value = SDATA.hero.subtitle.fr || ""; $("#hSubEn").value = SDATA.hero.subtitle.en || "";
+}
+
+function renderProducts() {
+  $("#prodList").innerHTML = SDATA.products.map((p, i) => `
+    <div class="prod-row">
+      <div class="prod-head">
+        <span class="prod-ico"><i class="fas ${esc(p.icon)}"></i></span>
+        <b>فئة ${i + 1}: ${esc(p.title.ar || "بدون اسم")}</b>
+        <select data-f="icon" data-i="${i}">
+          ${ICONS.map(([v, lbl]) => `<option value="${v}" ${p.icon === v ? "selected" : ""}>${lbl}</option>`).join("")}
+        </select>
+        <button class="btn btn-danger btn-sm" data-del="${i}">🗑️ حذف</button>
+      </div>
+      <div class="grid-3">
+        <div class="field" style="margin:0"><label>الاسم <span class="lang-tag">AR</span></label><input type="text" data-f="title.ar" data-i="${i}" value="${esc(p.title.ar)}" maxlength="60"></div>
+        <div class="field" style="margin:0"><label>Nom <span class="lang-tag">FR</span></label><input type="text" dir="ltr" data-f="title.fr" data-i="${i}" value="${esc(p.title.fr)}" maxlength="60"></div>
+        <div class="field" style="margin:0"><label>Name <span class="lang-tag">EN</span></label><input type="text" dir="ltr" data-f="title.en" data-i="${i}" value="${esc(p.title.en)}" maxlength="60"></div>
+        <div class="field" style="margin:0"><label>الوصف <span class="lang-tag">AR</span></label><textarea data-f="desc.ar" data-i="${i}" maxlength="300">${esc(p.desc.ar)}</textarea></div>
+        <div class="field" style="margin:0"><label>Description <span class="lang-tag">FR</span></label><textarea dir="ltr" data-f="desc.fr" data-i="${i}" maxlength="300">${esc(p.desc.fr)}</textarea></div>
+        <div class="field" style="margin:0"><label>Description <span class="lang-tag">EN</span></label><textarea dir="ltr" data-f="desc.en" data-i="${i}" maxlength="300">${esc(p.desc.en)}</textarea></div>
+      </div>
+    </div>`).join("");
+}
+
+/* تعديلات المنتجات */
+$("#prodList").addEventListener("input", (e) => {
+  const f = e.target.dataset.f, i = e.target.dataset.i;
+  if (f == null || i == null) return;
+  const p = SDATA.products[i];
+  if (f === "icon") {
+    p.icon = e.target.value;
+    e.target.closest(".prod-row").querySelector(".prod-ico i").className = "fas " + e.target.value;
+  } else {
+    const [a, b] = f.split(".");
+    p[a][b] = e.target.value;
+  }
+});
+$("#prodList").addEventListener("change", (e) => {
+  if (e.target.dataset.f === "icon") renderProducts();
+});
+$("#prodList").addEventListener("click", (e) => {
+  const del = e.target.closest("[data-del]");
+  if (!del) return;
+  if (!confirm("حذف هذه الفئة؟ (لن يُنشر الحذف إلا عند الضغط على حفظ)")) return;
+  SDATA.products.splice(Number(del.dataset.del), 1);
+  renderProducts();
+});
+$("#addProdBtn").addEventListener("click", () => {
+  SDATA.products.push({ icon: "fa-briefcase-medical", title: { ar: "فئة جديدة", fr: "", en: "" }, desc: { ar: "", fr: "", en: "" } });
+  renderProducts();
+  const rows = $$("#prodList .prod-row");
+  rows[rows.length - 1].scrollIntoView({ behavior: "smooth", block: "center" });
+});
+
+/* ===== الحفظ والنشر ===== */
+function collect() {
+  SDATA.stats = {
+    clients: Number($("#stClients").value) || 0,
+    products: Number($("#stProducts").value) || 0,
+    satisfaction: Math.min(100, Number($("#stSatisfaction").value) || 0),
+    years: Number($("#stYears").value) || 0
+  };
+  SDATA.contact = {
+    salesWa: $("#ctSalesWa").value.replace(/[^0-9]/g, ""),
+    complaintsWa: $("#ctCompWa").value.replace(/[^0-9]/g, ""),
+    phone: $("#ctPhone").value.replace(/[^0-9]/g, ""),
+    facebook: $("#ctFacebook").value.trim(),
+    hours: { ar: $("#ctHoursAr").value.trim(), fr: $("#ctHoursFr").value.trim(), en: $("#ctHoursEn").value.trim() },
+    location: { ar: $("#ctLocAr").value.trim(), fr: $("#ctLocFr").value.trim(), en: $("#ctLocEn").value.trim() }
+  };
+  SDATA.hero = {
+    badge: { ar: $("#hBadgeAr").value.trim(), fr: $("#hBadgeFr").value.trim(), en: $("#hBadgeEn").value.trim() },
+    subtitle: { ar: $("#hSubAr").value.trim(), fr: $("#hSubFr").value.trim(), en: $("#hSubEn").value.trim() }
+  };
+  SDATA.version = 2;
+}
+
+$("#saveBtn").addEventListener("click", async () => {
+  collect();
+  const btn = $("#saveBtn");
+  btn.disabled = true;
+  toast("⏳ جارٍ النشر للزوار...");
+  try {
+    const s = await RimStore.freshSession();
+    const r = await fetch(RimStore.SUPA_URL + "/rest/v1/site_data?id=eq.2", {
+      method: "PATCH",
+      headers: {
+        apikey: RimStore.SUPA_KEY,
+        Authorization: "Bearer " + s.access_token,
+        "Content-Type": "application/json",
+        Prefer: "return=representation"
+      },
+      body: JSON.stringify({ data: SDATA })
+    });
+    const rows = await r.json();
+    if (!r.ok || !Array.isArray(rows) || !rows.length) throw new Error((rows && rows.message) || "رُفض النشر — سجّل الخروج ثم الدخول");
+    toast("✅ تم الحفظ والنشر — التغييرات ظاهرة في موقع سند الآن", "ok");
+    renderProducts();
+  } catch (err) {
+    toast("⚠️ " + err.message, "err");
+  } finally {
+    btn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>
